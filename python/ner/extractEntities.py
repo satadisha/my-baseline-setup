@@ -160,31 +160,39 @@ for line in open('%s/hbc/data/dict-label3' % (BASE_DIR)):
     dict2label[dictionary] = label
 
 print >> sys.stderr, "Finished loading all models. Now reading from %s and writing to %s"  % (options.input_file, options.output_file)
+
+# tweets=pd.read_csv("tweet_data_frame.csv", header=0, index_col = 'ID' ,encoding = 'utf-8',delimiter=',')
+# tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',')
+tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',', keep_default_na=False)
+input_columns=list(tweets.columns.values)
+
 # WRITE TO STDOUT IF NO FILE IS GIVEN FOR OUTPUT
 out_fp = open(options.output_file, "wb+") if options.output_file is not None else sys.stdout
 writer = csv.writer(out_fp, delimiter=',')
+writer.writerow(input_columns)
 
-# tweets=pd.read_csv("tweet_data_frame.csv", header=0, index_col = 'ID' ,encoding = 'utf-8',delimiter=',')
-tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',')
 #with open(options.input_file) as fp:
 time_array=[]
 batch_size=3000
-for g, tweet_batch in tweets.groupby(np.arange(len(tweets)) //batch_size):
-    nLines = 0
-    start_time = time.time()
-    for index, row in tweet_batch.iterrows():        
-        #row = rows.strip().split("\t")
-        tweet = (row['Output'])
+# for g, tweet_batch in tweets.groupby(np.arange(len(tweets)) //batch_size):
+#     nLines = 0
+start_time = time.time()
+for index, row in tweets.iterrows():        
+    #row = rows.strip().split("\t")
+    print(index)
+    tweet = (row['Output'])
+    if(tweet!=''):
         # print(tweet)
         tweetSentences=list(filter (lambda sentence: len(sentence)>1, tweet.split('\n')))
         tweetSentenceList_inter=flatten(list(map(lambda sentText: sent_tokenize(sentText.lstrip().rstrip()),tweetSentences)),[])
         tweetSentenceList=list(filter (lambda sentence: len(sentence)>1, tweetSentenceList_inter))
-        nLines += len(tweetSentenceList)
+        # nLines += len(tweetSentenceList)
         tweet=''.join(tweetSentenceList)
         line = tweet.encode('utf-8', "ignore")
         if not line:
-            print >> sys.stderr, "Finished reading %s lines from %s"  % (nLines -1, options.input_file)
-            break
+            print >> sys.stderr, "Finished reading %s lines from %s"  % (index +1, options.input_file)
+            # break
+            continue
         #print >> sys.stderr, "Read Line: %s, %s" % (nLines, line),
         words = twokenize.tokenize(line)
         seq_features = []
@@ -276,6 +284,8 @@ for g, tweet_batch in tweets.groupby(np.arange(len(tweets)) //batch_size):
             output = ["%s//%s" % (output[x], events[x]) for x in range(len(output))]
         mentions=""
         candidateMention=""
+        # row[options.text_pos] = output
+        
         for outputStr in output:
             #outputStr=output[index]
             candidate=" ".join((outputStr.split("//"))[:-1])
@@ -291,7 +301,9 @@ for g, tweet_batch in tweets.groupby(np.arange(len(tweets)) //batch_size):
         #sys.stdout.write((" ".join(output) + "\n").encode('utf8'))
         #row[options.text_pos] = (" ".join(output)).encode('utf8')
         row[options.text_pos] = mentions.strip(',')
-        writer.writerow(row)
+    else:
+        print('nothing to do')
+    writer.writerow(row)
             #print >> sys.stderr, "\tWrote Line: %s, %s" % (nLines, row[options.text_pos])
 
         #    if pos:
@@ -302,24 +314,26 @@ for g, tweet_batch in tweets.groupby(np.arange(len(tweets)) //batch_size):
             #sys.stdout.flush()
 
             #seems like there is a memory leak comming from mallet, so just restart it every 1,000 tweets or so
-        if nLines % 10000 == 0:
-            #start = time.time()
-            ner.stdin.close()
-            ner.stdout.close()
-            #if ner.wait() != 0:
-            #sys.stderr.write("error!\n")
-            #ner.kill()
-            os.kill(ner.pid, SIGTERM)       #Need to do this for python 2.4
-            ner.wait()
-            ner = GetNer(ner_model)
+
+        # if nLines % 10000 == 0:
+        #     #start = time.time()
+        #     ner.stdin.close()
+        #     ner.stdout.close()
+        #     #if ner.wait() != 0:
+        #     #sys.stderr.write("error!\n")
+        #     #ner.kill()
+        #     os.kill(ner.pid, SIGTERM)       #Need to do this for python 2.4
+        #     ner.wait()
+        #     ner = GetNer(ner_model)
            
 
-    end_time = time.time()
-    processing_time= (str(end_time-start_time))
+end_time = time.time()
+processing_time= (str(end_time-start_time))
+print(processing_time)
     #time_array.append(total_time)
     #print >> sys.stderr, "Average time per tweet = %ss" % processing_time
-    list_to_convert=[(batch_size,nLines,processing_time)]
-    time_holder=(pd.DataFrame.from_records(list_to_convert, columns=['batch_size','no_of_Sentences', 'pTime']))
-    time_holder.to_csv('ritter_efficiency.csv',header=False,mode= 'a',encoding='utf-8')
+    # list_to_convert=[(batch_size,nLines,processing_time)]
+    # time_holder=(pd.DataFrame.from_records(list_to_convert, columns=['batch_size','no_of_Sentences', 'pTime']))
+    # time_holder.to_csv('ritter_efficiency.csv',header=False,mode= 'a',encoding='utf-8')
 
 

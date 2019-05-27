@@ -5,16 +5,19 @@ contact: ritter.1492@osu.edu
 Example Usage:
 --------------
 **UPDATES:**: python python/ner/extractEntities.py test500.tsv -t 5 -o output.tsv -k #initial 500
-		python python/ner/extractEntities.py tweet_data_frame.csv -t 3 -o finalOutput.tsv -k #new files
-python python/ner/extractEntities.py ahca.csv -t 4 -o output.tsv -k #new files
+		python python/ner/extractEntities.py tweets_3k_annotated_ritter.csv -t 3 -o sample-output.tsv -k #new files
+python python/ner/extractEntities.py deduplicated_test.csv -t 5 -o deduplicated_test_output.csv -k #new files
 
 **UPDATED:** : Added support for reading from file and writing to a tab seperated file which can have text in any column.
 
 ```
 export TWITTER_NLP=./
-python python/ner/extractEntities.py test.1k.txt -o output.txt
+python python/ner/extractEntities.py ritter_wnut.csv -o ritter_wnut_output.csv
 ```export TWITTER_NLP=./
 python python/ner/extractEntities.py tweet_data_frame.csv -t 3 -o finalOutput.tsv -k
+
+python python/ner/extractEntities.py output_1M_reintroduction_all_reintroduction_runs_with_annotations.csv -t 12 -o output_1M_reintroduction_all_reintroduction_runs_with_annotations_wRitterOutput.csv -k
+
 If the file is a tab separated file. Use the i-th (starting from 0) column as a text column to read from. 
 Output file will have that column data replaced with the annotated text.
 
