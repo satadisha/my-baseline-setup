@@ -18,6 +18,10 @@ python python/ner/extractEntities.py tweet_data_frame.csv -t 3 -o finalOutput.ts
 
 python python/ner/extractEntities.py output_1M_reintroduction_all_reintroduction_runs_with_annotations.csv -t 12 -o output_1M_reintroduction_all_reintroduction_runs_with_annotations_wRitterOutput.csv -k
 
+export TWITTER_NLP=./
+python3 python/ner/extractEntities.py ritter-ripcity.csv -t 3 -o ritter-ripcity-output.csv -k
+
+
 If the file is a tab separated file. Use the i-th (starting from 0) column as a text column to read from. 
 Output file will have that column data replaced with the annotated text.
 
