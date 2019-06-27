@@ -8,18 +8,31 @@ Example Usage:
 		python python/ner/extractEntities.py tweets_3k_annotated_ritter.csv -t 3 -o sample-output.tsv -k #new files
 python python/ner/extractEntities.py deduplicated_test.csv -t 5 -o deduplicated_test_output.csv -k #new files
 
+export TWITTER_NLP=./
+python python/ner/extractEntities.py /home/satadisha/Desktop/GitProjects/twitter-corpus-tools-master/twitter-tools-core/20110123.csv -t 3
+
+python python/ner/extractEntities.py /home/satadisha/Desktop/GitProjects/NeuroNER-master/neuroner/data/20110205_0_input/deploy/20110205_0.txt
+
 **UPDATED:** : Added support for reading from file and writing to a tab seperated file which can have text in any column.
 
 ```
 export TWITTER_NLP=./
 python python/ner/extractEntities.py ritter_wnut.csv -o ritter_wnut_output.csv
+
+
 ```export TWITTER_NLP=./
 python python/ner/extractEntities.py tweet_data_frame.csv -t 3 -o finalOutput.tsv -k
+
+export TWITTER_NLP=./
+python python/ner/extractEntities.py tweets_3k_annotated_ritter.csv -t 3 -o ritter_tweets_3k_annotated_output.csv
 
 python python/ner/extractEntities.py output_1M_reintroduction_all_reintroduction_runs_with_annotations.csv -t 12 -o output_1M_reintroduction_all_reintroduction_runs_with_annotations_wRitterOutput.csv -k
 
 export TWITTER_NLP=./
 python3 python/ner/extractEntities.py ritter-ripcity.csv -t 3 -o ritter-ripcity-output.csv -k
+
+export TWITTER_NLP=./
+python3 python/ner/extractEntities.py ritter-venezuela.csv -t 3 -o ritter-venezuela-output.csv -k
 
 
 If the file is a tab separated file. Use the i-th (starting from 0) column as a text column to read from. 

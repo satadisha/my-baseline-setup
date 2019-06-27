@@ -162,25 +162,41 @@ for line in open('%s/hbc/data/dict-label3' % (BASE_DIR)):
 print >> sys.stderr, "Finished loading all models. Now reading from %s and writing to %s"  % (options.input_file, options.output_file)
 
 # tweets=pd.read_csv("tweet_data_frame.csv", header=0, index_col = 'ID' ,encoding = 'utf-8',delimiter=',')
-# tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',')
-tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',', keep_default_na=False)
-input_columns=list(tweets.columns.values)
+# tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',')20110205_0_input
+# tweets=pd.read_csv(options.input_file, header=0, encoding = 'utf-8',delimiter=',', keep_default_na=False)
+# input_columns=list(tweets.columns.values)
+
+filename=options.input_file[12:]
+fp= open(options.input_file,"r")
+
+lines=fp.read().split("\n") # Create a list containing all lines
+fp.close() # Close file
+
+print(filename,len(lines))
 
 # WRITE TO STDOUT IF NO FILE IS GIVEN FOR OUTPUT
-out_fp = open(options.output_file, "wb+") if options.output_file is not None else sys.stdout
+mode='a'
+# if not os.path.exists(options.output_file):
+#     mode='w'
+out_fp = open(options.output_file, mode) if options.output_file is not None else sys.stdout
 writer = csv.writer(out_fp, delimiter=',')
-writer.writerow(input_columns)
+# writer.writerow(input_columns)
 
 #with open(options.input_file) as fp:
 time_array=[]
 batch_size=3000
+total_mentions=0
 # for g, tweet_batch in tweets.groupby(np.arange(len(tweets)) //batch_size):
 #     nLines = 0
 start_time = time.time()
-for index, row in tweets.iterrows():        
+# for index, row in tweets.iterrows():
+for index in range(len(lines)):        
     #row = rows.strip().split("\t")
+    
+    tweet = (lines[index])
+    # print(index,tweet)
     print(index)
-    tweet = (row['Output'])
+
     if(tweet!=''):
         # print(tweet)
         tweetSentences=list(filter (lambda sentence: len(sentence)>1, tweet.split('\n')))
@@ -300,10 +316,13 @@ for index, row in tweets.iterrows():
         mentions+=candidateMention
         #sys.stdout.write((" ".join(output) + "\n").encode('utf8'))
         #row[options.text_pos] = (" ".join(output)).encode('utf8')
-        row[options.text_pos] = mentions.strip(',')
+        mentions=mentions.strip(',')
+        output_len=len(list(filter(lambda elem: elem.strip() !='',mentions.split(','))))
+        # print(mentions,output_len)
+        total_mentions+= output_len
     else:
         print('nothing to do')
-    writer.writerow(row)
+    # writer.writerow(row)
             #print >> sys.stderr, "\tWrote Line: %s, %s" % (nLines, row[options.text_pos])
 
         #    if pos:
@@ -329,7 +348,11 @@ for index, row in tweets.iterrows():
 
 end_time = time.time()
 processing_time= (str(end_time-start_time))
-print(processing_time)
+print(processing_time,total_mentions)
+writer.writerow((filename,len(lines),processing_time,total_mentions))
+writer.writerow(())
+writer.writerow(())
+out_fp.close()
     #time_array.append(total_time)
     #print >> sys.stderr, "Average time per tweet = %ss" % processing_time
     # list_to_convert=[(batch_size,nLines,processing_time)]
